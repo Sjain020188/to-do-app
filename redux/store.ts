@@ -2,7 +2,8 @@ import { createStore } from 'redux';
 import { TodoItem } from '../types/types';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
-import { loadState, saveState } from './storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { persistStore, persistReducer } from 'redux-persist';
 
 /* --------------------------------------------------------------------------*/
 /*                              Types                                        */
@@ -28,6 +29,12 @@ type Action =
 export type BaseState = {
   isAuthenticated: boolean;
   todoItems: TodoItem[];
+};
+
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+  whitelist: ['todoItems']
 };
 
 /* --------------------------------------------------------------------------*/
@@ -80,10 +87,9 @@ export const appReducer = (state = initialState, action: Action) => {
   }
 };
 
-const store = createStore(appReducer);
+const rootReducer = persistReducer(persistConfig, appReducer);
 
-store.subscribe(() => {
-  saveState(store.getState());
-});
+const store = createStore(rootReducer);
+export const persistor = persistStore(store);
 
 export default store;
