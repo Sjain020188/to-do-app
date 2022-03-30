@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Platform, Keyboard } from 'react-native';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/native';
+import { useAddItem } from '../hooks/useAddItem';
 
 /* --------------------------------------------------------------------------*/
 /*                              Component                                    */
@@ -12,16 +13,7 @@ import styled from 'styled-components/native';
  *
  */
 export function Footer() {
-  const [text, setText] = useState('');
-  const dispatch = useDispatch();
-
-  function handleAddPress() {
-    if (text.length > 0) {
-      dispatch({ type: 'ADD_ITEM', title: text });
-    }
-    setText('');
-    Keyboard.dismiss();
-  }
+  const { submit, text, setText } = useAddItem()
 
   return (
     <S.KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -29,10 +21,10 @@ export function Footer() {
         <S.TextInput
           onChangeText={setText}
           value={text}
-          onSubmitEditing={handleAddPress}
+          onSubmitEditing={submit}
           returnKeyType={'done'}
         />
-        <S.TouchableOpacity onPress={handleAddPress}>
+        <S.TouchableOpacity onPress={submit}>
           <S.Text>Add</S.Text>
         </S.TouchableOpacity>
       </S.View>

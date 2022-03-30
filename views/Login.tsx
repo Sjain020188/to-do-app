@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ActivityIndicator } from 'react-native';
-import * as LocalAuthentication from 'expo-local-authentication';
 import styled from 'styled-components/native';
-import { useDispatch } from 'react-redux';
+import { useBiometrics } from '../hooks/useBiometrics';
+
 
 /* --------------------------------------------------------------------------*/
 /*                              Component                                    */
@@ -17,37 +17,7 @@ import { useDispatch } from 'react-redux';
  *
  */
 export function Login() {
-  const [isBiometricSupported, setIsBiometricSupported] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
-
-  const dispatch = useDispatch();
-
-  // check if device supports biometrics authetication.
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      const compatible = await LocalAuthentication.hasHardwareAsync();
-      setIsBiometricSupported(compatible);
-      setIsLoading(false);
-    })();
-  }, []);
-
-  // autheticate the user.
-  async function handleBiometricAuth() {
-    setIsLoading(true);
-    const biometricAuth = await LocalAuthentication.authenticateAsync({
-      promptMessage: 'Login with Biometrics',
-      fallbackLabel: 'Enter Passcode'
-    });
-    setIsLoading(false);
-    // Log the user in on success
-    if (biometricAuth.success) {
-      dispatch({ type: 'AUTHENTICATE' });
-    } else {
-      setError(true);
-    }
-  }
+  const {isLoading, isBiometricSupported, error, handleBiometricAuth} = useBiometrics()
 
   return (
     <S.View>

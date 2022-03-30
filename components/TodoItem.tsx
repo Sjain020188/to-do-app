@@ -1,8 +1,9 @@
 import CheckBox from '@react-native-community/checkbox';
-import React, { useState } from 'react';
-import { Keyboard, TouchableOpacity } from 'react-native';
-import { useDispatch } from 'react-redux';
+import React from 'react';
+import {  TouchableOpacity } from 'react-native';
+
 import styled from 'styled-components/native';
+import { useTodoItem } from '../hooks/useTodoItem';
 import { TodoItem as TodoItemType } from '../types/types';
 
 /* --------------------------------------------------------------------------*/
@@ -21,25 +22,7 @@ type Props = { item: TodoItemType };
  */
 
 export function TodoItem({ item }: Props) {
-  // state to keep track if the todo items needs to updated or not. If its in edit mode, then input text is displayed instead of text.
-  const [edit, setEdit] = useState(false);
-  // state to keep track of text inputed in text input.
-  const [text, setText] = useState(item.title);
-  const dispatch = useDispatch();
-
-  function handlePress() {
-    if (edit && text.length > 0) {
-      dispatch({ type: 'UPDATE_TITLE', id: item.id, title: text });
-      setEdit(false);
-      Keyboard.dismiss();
-    } else {
-      dispatch({ type: 'DELETE_ITEM', id: item.id });
-    }
-  }
-
-  function handleCheckboxSelect(val: boolean) {
-    dispatch({ type: 'UPDATE_ISCOMPLETED', id: item.id, isCompleted: val });
-  }
+  const { edit, setEdit, text, setText, handlePress, handleCheckboxSelect } = useTodoItem(item)
 
   return (
     <S.View.Container key={item.id} isCompleted={item.isCompleted}>
