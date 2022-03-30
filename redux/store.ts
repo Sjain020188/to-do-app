@@ -1,9 +1,9 @@
 import { createStore } from 'redux';
-import { TodoItem } from '../types/types';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persistStore, persistReducer } from 'redux-persist';
+import { TodoItem } from '../types/types';
 
 /* --------------------------------------------------------------------------*/
 /*                              Types                                        */
@@ -38,7 +38,20 @@ const persistConfig = {
 };
 
 /* --------------------------------------------------------------------------*/
-/*                        Initial state and reducer                           */
+/*                        Utility function                                   */
+/* --------------------------------------------------------------------------*/
+
+function getUpdatedTodoItems(itemId: string, items: TodoItem[], data: Partial<TodoItem>) {
+  return [...items].map((item) => {
+    if (item.id === itemId) {
+      return { ...item, ...data };
+    }
+    return item;
+  });
+}
+
+/* --------------------------------------------------------------------------*/
+/*                        Initial state and reducer                          */
 /* --------------------------------------------------------------------------*/
 
 const initialState: BaseState = {
@@ -53,29 +66,26 @@ export const appReducer = (state = initialState, action: Action) => {
     }
 
     case 'ADD_ITEM': {
-      const newState = {
+      return {
         ...state,
         todoItems: [...state.todoItems, { id: uuidv4(), title: action.title, isCompleted: false }]
       };
-      return newState;
     }
 
     case 'UPDATE_TITLE': {
-      const newTodoItems = [...state.todoItems];
-      const index = newTodoItems.findIndex(({ id }) => id === action.id);
-      if (index !== -1) {
-        newTodoItems[index].title = action.title;
-      }
-      return { ...state, todoItems: newTodoItems };
+      return {
+        ...state,
+        todoItems: getUpdatedTodoItems(action.id, state.todoItems, { title: action.title })
+      };
     }
 
     case 'UPDATE_ISCOMPLETED': {
-      const newTodoItems = [...state.todoItems];
-      const index = newTodoItems.findIndex(({ id }) => id === action.id);
-      if (index !== -1) {
-        newTodoItems[index].isCompleted = action.isCompleted;
-      }
-      return { ...state, todoItems: newTodoItems };
+      return {
+        ...state,
+        todoItems: getUpdatedTodoItems(action.id, state.todoItems, {
+          isCompleted: action.isCompleted
+        })
+      };
     }
 
     case 'DELETE_ITEM': {
@@ -88,8 +98,8 @@ export const appReducer = (state = initialState, action: Action) => {
 };
 
 const rootReducer = persistReducer(persistConfig, appReducer);
-
 const store = createStore(rootReducer);
+
 export const persistor = persistStore(store);
 
 export default store;
