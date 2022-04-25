@@ -2,7 +2,6 @@
 
 ## Introduction
 
-This project is created as a part of Coding Challenge for Paidy.
 Its a MVP CRUD todo app written in React Native. Biometrics login is required in order to access the app. Within the app you can add todo item, update it, mark it completed or delete it.
 
 ## Functionality
